@@ -648,3 +648,39 @@ CREATE TABLE final_data AS( SELECT DISTINCT(cwzd.DISEASE), cwzd.DISEASE_DESCRIPT
 									JOIN vaccines_diseases AS vd
 									ON vwz.ANTIGEN=vd.vaccine) AS vwzd
 							ON cwzd.DISEASE = vwzd.disease AND cwzd.year = vwzd.year AND cwzd.WHO_zone = vwzd.WHO_zone);
+
+
+CREATE TABLE cases_country_zone AS( 	SELECT cc.country, cc.DISEASE, cc.DISEASE_DESCRIPTION,cw.WHO_zone, cc.YEAR,  SUM(cc.CASES) AS Total_Cases
+								FROM cases_country AS cc
+								JOIN countries_who AS cw
+								ON  cc.country = cw.country
+								WHERE CASES>0
+								GROUP BY cc.country, cw.WHO_zone, cc.DISEASE, cc.DISEASE_DESCRIPTION, cc.YEAR
+								ORDER by 
+										WHO_zone,
+										cc.YEAR);
+                                        
+                                        
+CREATE TABLE vaccines_country_zone AS( SELECT cc.COUNTRYNAME, cc.ANTIGEN_DESCRIPTION, cc.ANTIGEN, cw.WHO_zone, cc.YEAR, ROUND (SUM(cc.TARGET_NUMBER),0) AS Target,  ROUND(SUM(cc.DOSES)) AS Doses
+								FROM covarage_country AS cc
+								JOIN countries_who AS cw
+								ON  cc.COUNTRYNAME = cw.country
+								WHERE DOSES>0
+								GROUP BY cw.WHO_zone, cc.ANTIGEN, cc.ANTIGEN_DESCRIPTION, cc.YEAR, cc.COUNTRYNAME
+								ORDER by 
+										cw.WHO_zone,
+										cc.YEAR);
+                                        			
+CREATE TABLE final_data_country AS( SELECT DISTINCT(cwzd.country), cwzd.DISEASE,cwzd.DISEASE_DESCRIPTION, cwzd.WHO_zone, cwzd.YEAR, cwzd.Total_Cases, vwzd.ANTIGEN_DESCRIPTION, vwzd.ANTIGEN, vwzd.Target, vwzd.Doses
+							FROM  (SELECT cwz.country, cwz.DISEASE, cwz.DISEASE_DESCRIPTION, cwz.WHO_zone, cwz.YEAR, cwz.Total_Cases
+									FROM cases_country_zone AS cwz
+									JOIN vaccines_diseases AS vd
+									ON cwz.DISEASE=vd.disease) AS cwzd
+							JOIN (SELECT vwz.COUNTRYNAME, vwz.ANTIGEN_DESCRIPTION, vwz.ANTIGEN, vwz.WHO_zone, vwz.YEAR, vwz.Target, vwz.Doses, vd.disease 
+									FROM vaccines_country_zone AS vwz
+									JOIN vaccines_diseases AS vd
+									ON vwz.ANTIGEN=vd.vaccine) AS vwzd
+							ON cwzd.country=vwzd.COUNTRYNAME AND cwzd.DISEASE = vwzd.disease AND cwzd.year = vwzd.year AND cwzd.WHO_zone = vwzd.WHO_zone);                                        
+                                        
+SELECT * FROM final_data;
+SELECT * FROM final_data_country;
