@@ -1,7 +1,7 @@
 # Measles Vaccination Data Analysis and Prediction
 
 ## Overview
-This Jupyter Notebook analyzes measles vaccination data and builds a predictive model to estimate measles cases based on vaccination data. It also explores the impact of increasing vaccination rates on predicted measles cases.
+This Jupyter Notebook analyzes measles vaccination data and builds a predictive model to estimate measles cases based on vaccination data. It also explores the impact of increasing vaccination rates on predicted measles cases. This was a final project and was made only for this propose.
 
 ## Installation
 To run this notebook, you need to have Python installed along with the following libraries:
